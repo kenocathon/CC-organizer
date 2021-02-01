@@ -1,0 +1,11 @@
+POST http://localhost:8000/api/admin/users HTTP/2.0
+Content-Type: application/json
+
+{
+  "role": "User",
+   "userName": "CCjessicaHarris",
+   "password": "password123",
+   "firstName": "Jessica",
+   "lastName": "Harris",
+   "email": "jessica_harris@completecrete.com"
+}
