@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 import { setAlert } from '../../../actions/alert';
 import PropTypes from 'prop-types';
 import Alert from '../../layout/Alert';
+import PageHeader from '../../layout/PageHeader';
 
+// Mui Components
 import {
   Button,
   Container,
@@ -13,6 +15,8 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
+import AccessibilityNewIcon from '@material-ui/icons/AccessibilityNew';
+
 
 const useStyles = makeStyles({
   root: {
@@ -31,7 +35,8 @@ const useStyles = makeStyles({
     padding: '3rem',
   },
   formButton: {
-    margin: '.5rem',
+    margin: '3.5rem .5rem 1rem .5rem',
+    width: '90%',
   },
 });
 
@@ -72,12 +77,12 @@ function Customers({ setAlert }) {
   };
 
   return (
+    <>    
+    <PageHeader  title='Create Customer' headerIcon={<AccessibilityNewIcon />}/>
+    <Container>
+
+    
     <Paper className={root}>
-      <div>
-        <Typography variant='h6' className={title}>
-          Create New Customer
-        </Typography>
-      </div>
       <form onSubmit={(e) => onSubmit(e)}>
         <Container className={formControl}>
           <div className={title}>
@@ -174,20 +179,23 @@ function Customers({ setAlert }) {
             </Grid>
           </Grid>
           <Alert />
-
+          <Grid container justify='center'>
           <Button
             variant='contained'
             color='primary'
             type='submit'
             className={formButton}
             size='large'
-            style={{ width: '40%' }}
+            
           >
             Submit
           </Button>
+          </Grid>
         </Container>
       </form>
     </Paper>
+    </Container>
+    </>
   );
 }
 

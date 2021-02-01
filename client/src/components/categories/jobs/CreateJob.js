@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { listEmployees } from '../../../api/api-employee';
+import { listAssets } from '../../../api/api-get';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
-import { createJob } from '../../../api/api-job';
+import { createAsset } from '../../../api/api-post';
+
 import {
-  Button,
   Checkbox,
   Container,
   FormControl,
@@ -58,7 +58,7 @@ const useStyles = makeStyles({
 });
 
 export default function CreateJob() {
-  const { title, root, formControl, formButton, formElement } = useStyles();
+  const { title, root, formElement } = useStyles();
 
   const [inputFieldData, setInputFieldData] = useState({
     jobName: '',
@@ -82,35 +82,9 @@ export default function CreateJob() {
     subdivision: '',
   });
 
-  const { data: employees } = useGetRequest(listEmployees);
+  const { data: customers } = useGetRequest(listAssets, '/customers');
 
-  const [employeeCheckboxes, setEmployeeCheckboxes] = useState({
-    checkboxes: {
-      Keenan: true,
-      Josh: false,
-      Glen: true,
-      Hilliary: false,
-    },
-  });
-
-  useEffect(() => {
-    const employee = (employees) => {
-      return employees && employees.map((employee) => employee._id);
-    };
-
-    setEmployeeCheckboxes({
-      ...employeeCheckboxes,
-      checkboxes: employee(employees).reduce(
-        (options, option) => ({
-          ...options,
-          [option]: true,
-        }),
-        {}
-      ),
-    });
-  }, [employees]); // ONly use employees as dependency
-
-  const { checkboxes } = employeeCheckboxes;
+  
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -135,8 +109,9 @@ export default function CreateJob() {
         lotNumber: location.lotNumber,
         subdivision: location.subdivision,
       },
-      scheduledEmployees: '',
     };
+
+    createAsset(job, {url: '/jobs'})
   };
 
   const handleChange = (name) => (e) => {
@@ -159,19 +134,12 @@ export default function CreateJob() {
     setLocation({ ...location, [name]: e.target.value });
   };
 
-  const handleEmployeeCheckboxes = (name) => (e) => {
-    const checkboxes = employeeCheckboxes.checkboxes;
-    checkboxes[name] = e.target.checked;
-    setEmployeeCheckboxes({ checkboxes });
-  };
-
   function camelCaseToTextCase(str) {
     const result = str.replace(/([A-Z])/g, ' $1');
     const spliceBack = result.charAt(0).toUpperCase() + result.slice(1);
 
     return spliceBack;
   }
-  console.log(employeeCheckboxes);
 
   return (
     <Paper className={root} style={{ overflow: 'none' }}>
@@ -284,25 +252,6 @@ export default function CreateJob() {
                 </RadioGroup>
               </FormControl>
             </Grid>
-
-            <FormControl component='fieldset'>
-              <FormLabel component='legend'>Schedule Employees</FormLabel>
-              <Grid container>
-                {employees.map((employee) => (
-                  <Grid item xs={12} sm={4} md={3} lg={2} key={employee.id}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={checkboxes[employee]}
-                          onChange={handleEmployeeCheckboxes(employee._id)}
-                        />
-                      }
-                      label={`${employee.firstName} ${employee.lastName}`}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </FormControl>
           </Grid>
           <FormButton text='Submit' />
         </Container>

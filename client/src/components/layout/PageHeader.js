@@ -10,7 +10,10 @@ import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: '2rem',
+    padding: '2rem'
+  },
+  content: {
+    marginBottom: '1rem',
   },
   titleBox: {
     display: 'flex',
@@ -18,15 +21,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PageHeader({ headerIcon, title }) {
-  const { root, titleBox } = useStyles();
+export default function PageHeader({ headerIcon, title, path }) {
+  const { root, content, titleBox } = useStyles();
 
   return (
-    <Container>
+    <Container className={content}>
       <Paper className={root}>
         <div className={titleBox}>
           <Typography variant='h5'>{title}</Typography>
-          <IconButton href={`${title.toLowerCase()}/create`}>
+          <IconButton href={path && `${title.toLowerCase()}${path}`}>
             {headerIcon}
           </IconButton>
         </div>

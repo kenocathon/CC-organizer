@@ -3,5 +3,5 @@ import PageHeader from '../../layout/PageHeader';
 import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
 
 export default function Jobs() {
-  return <PageHeader title='Jobs' headerIcon={<LibraryAddIcon />} />;
+  return <PageHeader title='Jobs' headerIcon={<LibraryAddIcon />} path='/create'/>;
 }

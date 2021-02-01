@@ -29,6 +29,7 @@ import Purchasing from '../../categories/purchasing/Purchasing';
 import CreateCustomer from '../../categories/customers/CreateCustomer';
 import PrivateRoute from '../../../api/auth/PrivateRoute';
 import CreateJob from '../../categories/jobs/CreateJob';
+import CompletJob from '../../categories/jobs/CompleteJob';
 
 const drawerWidth = '240px';
 
@@ -150,6 +151,7 @@ const Navigation = () => {
             <Route exact path='/dashboard' render={() => <Dashboard />} />
             <Route exact path='/jobs' render={() => <Jobs />} />
             <Route path='/jobs/create' render={() => <CreateJob />} />
+            <Route path='/jobs/complete' render={() => <CompletJob/>} />
             <Route exact path='/customers' render={() => <Customers />} />
             <Route path='/customers/create' render={() => <CreateCustomer />} />
             <Route exact path='/employees' render={() => <Employees />} />
