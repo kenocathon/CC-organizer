@@ -1,4 +1,4 @@
-export const createAsset = async (asset, {url}) => {
+export const createAsset = async (asset, url) => {
   try {
     let response = await fetch(`/api/user${url}`, {
       method: 'POST',

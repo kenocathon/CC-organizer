@@ -1,6 +1,6 @@
-export const listAssets = async (signal) => {
+export const listAssets = async (signal, url) => {
   try {
-    let response = await fetch(`api/user/employees`, {
+    let response = await fetch(`http://localhost:8000/api/user${url}/`, {
       method: 'GET',
       signal: signal,
     });
@@ -10,7 +10,7 @@ export const listAssets = async (signal) => {
   }
 };
 
-export const searchAssets = async (signal, {url}) => {
+export const searchAssets = async (signal, { url }) => {
   try {
     let response = await fetch(`api/user/search${url}`, {
       method: 'GET',

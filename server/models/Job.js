@@ -43,7 +43,7 @@ const JobSchema = new mongoose.Schema({
   },
   payType: {
     type: String,
-    enum: ['Daily', 'Hourly', 'Salary'],
+    enum: ['Daily', 'Hourly'],
   },
   scheduledDate: {
     type: Date,
@@ -58,12 +58,6 @@ const JobSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  scheduledEmployees: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'employee',
-    },
-  ],
   employeesThatWorked: [
     {
       employee: {
@@ -103,7 +97,7 @@ const JobSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Scheduled', 'Complete'],
+    enum: ['Scheduled', 'Unscheduled', 'Complete'],
   },
 });
 

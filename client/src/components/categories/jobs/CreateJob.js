@@ -11,10 +11,13 @@ import {
   FormControlLabel,
   FormLabel,
   Grid,
+  InputLabel,
   makeStyles,
+  MenuItem,
   Paper,
   Radio,
   RadioGroup,
+  Select,
   TextField,
   Typography,
 } from '@material-ui/core';
@@ -60,6 +63,15 @@ const useStyles = makeStyles({
 export default function CreateJob() {
   const { title, root, formElement } = useStyles();
 
+  const [location, setLocation] = useState({
+    street: '',
+    city: '',
+    state: 'GA',
+    zipcode: '',
+    lotNumber: '',
+    subdivision: '',
+  });
+  const currentYear = new Date().getFullYear();
   const [inputFieldData, setInputFieldData] = useState({
     jobName: '',
     customer: '',
@@ -68,31 +80,32 @@ export default function CreateJob() {
   });
   const { jobName, customer } = inputFieldData;
 
-  const [jobType, setJobType] = useState('flat');
+  const [jobType, setJobType] = useState('Flat');
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
 
-  const [location, setLocation] = useState({
-    street: '',
-    city: '',
-    state: '',
-    zipcode: '',
-    lotNumber: '',
-    subdivision: '',
-  });
-
   const { data: customers } = useGetRequest(listAssets, '/customers');
 
-  
+  useEffect(() => {
+    setInputFieldData({
+      ...inputFieldData,
+      jobName: `jb/${
+        location.subdivision &&
+        location.subdivision
+          .split(/\s/)
+          .reduce((response, word) => (response += word.slice(0, 3)), '')
+      }-${location.lotNumber || '00'}/${currentYear}`,
+    });
+  }, [location.subdivision, location.lotNumber]);
 
   const onSubmit = (e) => {
     e.preventDefault();
     const job = {
-      customer: 'id',
+      customer: inputFieldData.customer,
       jobName: inputFieldData.jobName,
       jobType,
-      payTye: () => {
+      payType: () => {
         if (jobType === 'Flat') {
           return 'Daily';
         } else {
@@ -109,9 +122,10 @@ export default function CreateJob() {
         lotNumber: location.lotNumber,
         subdivision: location.subdivision,
       },
+      status: 'Unscheduled',
     };
 
-    createAsset(job, {url: '/jobs'})
+    createAsset(job, '/jobs');
   };
 
   const handleChange = (name) => (e) => {
@@ -121,13 +135,9 @@ export default function CreateJob() {
       setInputFieldData({ ...inputFieldData, [name]: e.target.value });
     }
   };
-  const handleDateChange = (date) => (e) => {
-    if (e.target.id === 'time-picker') {
-      setSelectedTime(date);
-      setInputFieldData({ ...inputFieldData, status: 'Scheduled' });
-    } else {
-      setSelectedDate(date);
-    }
+
+  const handleCustomer = (e) => {
+    setInputFieldData({ ...inputFieldData, customer: e.target.value });
   };
 
   const handleLocation = (name) => (e) => {
@@ -148,6 +158,21 @@ export default function CreateJob() {
       </Typography>
       <form onSubmit={(e) => onSubmit(e)} className={formElement}>
         <Container>
+          <Grid container>
+            {Object.keys(location).map((field) => {
+              return (
+                <Grid item xs={12} sm={6} md={4} key={field}>
+                  <TextField
+                    variant='outlined'
+                    label={camelCaseToTextCase(field)}
+                    value={location[field]}
+                    size='small'
+                    onChange={handleLocation(field)}
+                  />
+                </Grid>
+              );
+            })}
+          </Grid>
           <FormControl component='fieldset'>
             <FormLabel component='legend'>Job Info</FormLabel>
             <Grid container>
@@ -161,28 +186,24 @@ export default function CreateJob() {
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={4}>
-                <TextField
-                  variant='outlined'
-                  label='Customer Name'
-                  value={customer}
-                  size='small'
-                  onChange={handleChange('jobName')}
-                />
+                <FormControl variant='outlined'>
+                  <InputLabel id='customer-name'>Customer Name</InputLabel>
+                  <Select
+                    labelId='customer-label'
+                    id='customer-select'
+                    value={customer.name}
+                    onChange={handleCustomer}
+                    style={{ height: '2.4rem' }}
+                  >
+                    {customers &&
+                      customers.map((person) => (
+                        <MenuItem value={person._id}>
+                          {person.firstName + ' ' + person.lastName}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
               </Grid>
-
-              {Object.keys(location).map((field) => {
-                return (
-                  <Grid item xs={12} sm={6} md={4} key={field}>
-                    <TextField
-                      variant='outlined'
-                      label={camelCaseToTextCase(field)}
-                      value={location[field]}
-                      size='small'
-                      onChange={handleLocation(field)}
-                    />
-                  </Grid>
-                );
-              })}
             </Grid>
           </FormControl>
           <Grid container>
@@ -196,7 +217,7 @@ export default function CreateJob() {
                   id='date-picker'
                   label='Scheduled Date'
                   value={selectedDate}
-                  onChange={handleDateChange}
+                  onChange={setSelectedDate}
                   KeyboardButtonProps={{
                     'aria-label': 'change date',
                   }}
@@ -207,8 +228,8 @@ export default function CreateJob() {
                   margin='normal'
                   id='time-picker'
                   label='Scheduled Time'
-                  value={selectedDate}
-                  onChange={handleDateChange}
+                  value={selectedTime}
+                  onChange={setSelectedTime}
                   KeyboardButtonProps={{
                     'aria-label': 'change time',
                   }}
@@ -229,21 +250,21 @@ export default function CreateJob() {
                   <Grid container>
                     <Grid item xs={12} sm={4} md={3} lg={2}>
                       <FormControlLabel
-                        value='flat'
+                        value='Flat'
                         control={<Radio />}
                         label='Flat'
                       />
                     </Grid>
                     <Grid item xs={12} sm={4} md={3} lg={2}>
                       <FormControlLabel
-                        value='wall'
+                        value='Wall'
                         control={<Radio />}
                         label='Wall'
                       />
                     </Grid>
                     <Grid item xs={12} sm={4} md={3} lg={2}>
                       <FormControlLabel
-                        value='other'
+                        value='Other'
                         control={<Radio />}
                         label='Other'
                       />

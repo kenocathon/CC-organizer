@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
 
-
-const useGetRequest = (fetchFunction) => {
+const useGetRequest = (fetchFunction, url) => {
   const [data, setData] = useState([]);
   // const [isLoading, setIsLoading] = useState(true);
   // const [error, setError] = useState(null);
 
   useEffect(() => {
     const abortCont = new AbortController();
-    fetchFunction(abortCont.signal).then((data) => setData(data));
+    fetchFunction(abortCont.signal, url).then((data) => setData(data));
     return () => {
       abortCont.abort();
     };
-  }, [fetchFunction]);
+  }, [fetchFunction, url]);
   return { data };
 };
 

@@ -12,7 +12,7 @@ const listCustomers = async (signal) => {
 
 const searchCustomers = async (signal) => {
   try {
-    let response = await fetch('api/user/search/customers', {
+    let response = await fetch('api/user/search/customers/', {
       method: 'GET',
       signal: signal,
     });
