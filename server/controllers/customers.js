@@ -1,5 +1,5 @@
 const Customer = require('../models/Customer');
-const {extend} = require('lodash')
+const { extend } = require('lodash');
 const errorHandler = require('../helpers/dbErrorHandler');
 
 module.exports = {
@@ -31,11 +31,13 @@ module.exports = {
     }
   },
 
-  searchable: async(req, res) => {
-    try{
-      let customers = await Customer.find().select('companyName firstName lastName email')
-      res.json(customers)
-    }catch (err) {
+  searchable: async (req, res) => {
+    try {
+      let customers = await Customer.find().select(
+        'companyName firstName lastName email'
+      );
+      res.json(customers);
+    } catch (err) {
       return res.status(500).json({
         error: errorHandler.getErrorMessage(err),
       });
@@ -87,11 +89,12 @@ module.exports = {
   removeCustomer: async (req, res) => {
     let customer = req.customer;
     try {
-      if(customer.listOfJobs > 0){
+      if (customer.listOfJobs > 0) {
         return res.status(400).json({
-          message: "There are jobs associated with this customer. Delete all jobs before attempting to delete customer"
-        })
-      }else{
+          message:
+            'There are jobs associated with this customer. Delete all jobs before attempting to delete customer',
+        });
+      } else {
         let deletedCustomer = await customer.remove();
         res.json(deletedCustomer);
       }

@@ -151,7 +151,7 @@ const Navigation = () => {
             <Route exact path='/dashboard' render={() => <Dashboard />} />
             <Route exact path='/jobs' render={() => <Jobs />} />
             <Route path='/jobs/create' render={() => <CreateJob />} />
-            <Route path='/jobs/complete' render={() => <CompletJob/>} />
+            <Route path='/jobs/complete/:jobId' render={() => <CompletJob />} />
             <Route exact path='/customers' render={() => <Customers />} />
             <Route path='/customers/create' render={() => <CreateCustomer />} />
             <Route exact path='/employees' render={() => <Employees />} />

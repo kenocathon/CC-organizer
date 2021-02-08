@@ -1,71 +1,58 @@
-import React, {useEffect, useState} from 'react';
-import PageHeader from '../../layout/PageHeader'
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import PageHeader from '../../layout/PageHeader';
 import useGetRequest from '../../hooks/useGetRequest';
-import {listAssets} from '../../../api/api-get'
+import { listAssets, singleAsset } from '../../../api/api-get';
 
-//Icon
+//Material UI
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
-import { Checkbox, FormControl, FormControlLabel, FormLabel, Grid } from '@material-ui/core';
-import {listEmployees} from '../../../api/api-employee'
+import { Checkbox, FormControlLabel, Grid } from '@material-ui/core';
 
 const CompleteJob = () => {
+  const { jobId } = useParams();
+  const { data: job } = useGetRequest(singleAsset, `/job/${jobId}`);
+  const { data: employees } = useGetRequest(listAssets, '/employees');
 
-  const [employeeCheckboxes, setEmployeeCheckboxes] = useState({});
-
-  const { data: employees} = useGetRequest(listEmployees);
-
-  console.log(employees)
-
-  useEffect(() => {
-    const employee = (employees) => {
-      return employees && employees.map((employee) => employee._id);
-    };
-
-    setEmployeeCheckboxes({
-      ...employeeCheckboxes,
-      checkboxes: employee(employees).reduce(
-        (options, option) => ({
-          ...options,
-          [option]: true,
-        }),
-        {}
-      ),
-    });
-    
-  }, [employees]); // ONly use employees as dependency
-
-  const { checkboxes } = employeeCheckboxes;
-
-  const handleEmployeeCheckboxes = (name) => (e) => {
-    const checkboxes = employeeCheckboxes.checkboxes;
-    checkboxes[name] = e.target.checked;
-    setEmployeeCheckboxes({ checkboxes });
-  };
+  const { employeeList, setEmployeeList } = useState();
 
   return (
-    <div>
-      <PageHeader title='Complete Job' headerIcon={<AssignmentTurnedInIcon />} />
-      <FormControl component='fieldset'>
-              <FormLabel component='legend'>Select Employees That Worked</FormLabel>
-              <Grid container>
-                {employees.length > 0 && employees.map((employee) => (
-                  <Grid item xs={12} sm={4} md={3} lg={2} key={employee.id}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={checkboxes[employee]}
-                          onChange={handleEmployeeCheckboxes(employee._id)}
-                        />
-                      }
-                      label={`${employee.firstName} ${employee.lastName}`}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </FormControl>
-
-    </div>
+    <>
+      <PageHeader
+        title='Complete Job'
+        headerIcon={<AssignmentTurnedInIcon />}
+      />
+      <Grid container>
+        <Grid item>
+          <h3>Complete {job.jobName}</h3>
+        </Grid>
+        <Grid item>
+          {employeeList &&
+            employeeList.map((employee) => (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={state.checkedA}
+                    onChange={handleChange}
+                    name='checkedA'
+                  />
+                }
+                label='Secondary'
+              />
+            ))}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedA}
+                onChange={handleChange}
+                name='checkedA'
+              />
+            }
+            label='Secondary'
+          />
+        </Grid>
+      </Grid>
+    </>
   );
-}
+};
 
 export default CompleteJob;

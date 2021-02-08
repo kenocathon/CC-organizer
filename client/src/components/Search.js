@@ -1,48 +1,46 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import {
-  Container,
-  IconButton,
-  Link,
+  FormControl,
+  Grid,
+  InputLabel,
   makeStyles,
-  Paper,
-  Typography,
+  MenuItem,
+  Select,
+  TextField,
 } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+import DataTable from './DataTable';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: '2rem',
-  },
-  titleBox: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  searchBox: {
-    width: '80%',
-    padding: '.25rem',
+  formControl: {
+    width: '10rem',
+    '& .MuiFormControl-root': {
+      minWidth: '6rem',
+    },
   },
 }));
 
-export default function Search({ pageTitle, data }) {
-  const { root, searchBox, titleBox } = useStyles();
+export default function Search({ data, from }) {
+  const classes = useStyles();
 
-  const initialState = {
-    options: data[0] && Object.keys(data[0]),
+  const [query, setQuery] = useState('');
+  const [selectedOption, setSelectedOption] = useState(
+    from === 'jobs' ? 'customerName' : 'firstName'
+  );
+
+  const handleChange = (event) => {
+    setSelectedOption(event.target.value);
   };
 
-  const [query, setquery] = useState('');
-  const [selectedOption, setSelectedOption] = useState(initialState.options);
-
-  function search(rows) {
-    return rows.filter((row) =>
-      initialState.options.some((option) => {
-        return row[option]
-          .toString()
+  function search(dataToSearch) {
+    return dataToSearch.filter(
+      (dataToSearch) =>
+        dataToSearch[selectedOption]
           .toLowerCase()
-          .indexOf(query.toLowerCase() > -1);
-      })
+          .indexOf(query.toLowerCase()) > -1
     );
   }
+
+  console.log(search(data));
 
   function camelCaseToTextCase(str) {
     const result = str.replace(/([A-Z])/g, ' $1');
@@ -51,5 +49,36 @@ export default function Search({ pageTitle, data }) {
     return spliceBack;
   }
 
-  return <div>Search</div>;
+  return (
+    <Fragment>
+      <Grid container xs={6} md={4} style={{ marginBottom: '2rem' }}>
+        <Grid item xs={12} md={6}>
+          <FormControl className={classes.formControl}>
+            <InputLabel>Filter By:</InputLabel>
+            <Select
+              labelId='filter-select'
+              id='filter-select'
+              value={selectedOption}
+              onChange={handleChange}
+            >
+              {data[0] &&
+                Object.keys(data[0]).map((key) => (
+                  <MenuItem key={key} value={key}>
+                    {key !== '_id' && camelCaseToTextCase(key)}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item>
+          <TextField
+            label='Search'
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </Grid>
+      </Grid>
+      <DataTable data={search(data)} from='jobs' />
+    </Fragment>
+  );
 }

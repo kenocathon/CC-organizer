@@ -3,23 +3,28 @@ const Customer = require('../models/Customer');
 const errorHandler = require('../helpers/dbErrorHandler');
 
 module.exports = {
-  scheduleJob: async (req, res) => {
+  createJob: async (req, res) => {
     const job = new Job(req.body);
-    const customer = await Customer.findById(job.customer);
     try {
-      if (job.scheduledDate) {
-        job.status = 'Scheduled';
-      } else {
-        job.status = 'Unscheduled';
-      }
       await job.save();
-      customer.listOfJobs.push(job);
-      await customer.save();
       return res.status(201).json({
-        message: 'Job was successfully scheduled',
+        message: 'Job was successfully created',
       });
     } catch (err) {
       console.error(err);
+      return res.status(500).json({
+        error: 'Something is missing, error encountered creating job',
+      });
+    }
+  },
+
+  searchable: async (req, res) => {
+    try {
+      let findJobs = await Job.find()
+        .select('customer jobName jobType location')
+        .populate('customer');
+      res.json(findJobs);
+    } catch (err) {
       return res.status(500).json({
         error: errorHandler.getErrorMessage(err),
       });

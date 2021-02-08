@@ -14,10 +14,12 @@ const JobSchema = new mongoose.Schema({
     city: {
       type: String,
       trim: true,
+      require,
     },
     state: {
       type: String,
       trim: true,
+      require,
     },
     zipcode: {
       type: String,
@@ -35,6 +37,7 @@ const JobSchema = new mongoose.Schema({
   jobName: {
     type: String,
     trim: true,
+    require,
   },
   jobType: {
     type: String,
@@ -83,13 +86,6 @@ const JobSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'material',
       },
-    },
-  ],
-
-  addedMaterials: [
-    {
-      type: String,
-      trim: true,
     },
   ],
   notes: {

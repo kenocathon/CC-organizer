@@ -5,7 +5,18 @@ import PageHeader from '../../layout/PageHeader';
 import { searchAssets } from '../../../api/api-get';
 
 export default function Customers() {
-  const { data } = useGetRequest(searchAssets,'/customers');
+  const { data } = useGetRequest(searchAssets, '/customers');
 
-  return <PageHeader headerIcon={<GroupAddIcon />} title='Customers' path='/create'/>;
+  console.log(data);
+
+  return (
+    <div>
+      <PageHeader
+        headerIcon={<GroupAddIcon />}
+        title='Customers'
+        path='/create'
+      />
+      <Search data={data} from='customers' />
+    </div>
+  );
 }

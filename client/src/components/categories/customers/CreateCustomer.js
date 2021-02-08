@@ -16,7 +16,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import AccessibilityNewIcon from '@material-ui/icons/AccessibilityNew';
-
+import { createAsset } from '../../../api/api-post';
 
 const useStyles = makeStyles({
   root: {
@@ -40,18 +40,20 @@ const useStyles = makeStyles({
   },
 });
 
+const initialFormState = {
+  company: '',
+  firstName: '',
+  lastName: '',
+  phoneNumber: '',
+  email: '',
+  street: '',
+  city: '',
+  state: 'Georgia',
+  zip: '',
+};
+
 function Customers({ setAlert }) {
-  const [formData, setFormData] = useState({
-    company: '',
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    email: '',
-    street: '',
-    city: '',
-    state: 'Georgia',
-    zip: '',
-  });
+  const [formData, setFormData] = useState(initialFormState);
 
   const {
     company,
@@ -73,128 +75,151 @@ function Customers({ setAlert }) {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    setAlert('Customer created successfully', 'success');
+    const customer = {
+      companyName: company,
+      firstName,
+      lastName,
+      phoneNumber,
+      email,
+      billingAddress: {
+        street,
+        city,
+        state,
+        zipcode: zip,
+      },
+    };
+    createAsset(customer, '/customers').then((res) => {
+      if (res.error) {
+        setAlert(res.error);
+      } else if (res.message) {
+        setAlert(res.message);
+        setFormData(initialFormState);
+      }
+    });
   };
 
   return (
-    <>    
-    <PageHeader  title='Create Customer' headerIcon={<AccessibilityNewIcon />}/>
-    <Container>
-
-    
-    <Paper className={root}>
-      <form onSubmit={(e) => onSubmit(e)}>
-        <Container className={formControl}>
-          <div className={title}>
-            <Typography variant='subtitle2'>Customer Info</Typography>
-          </div>
-          <Grid container>
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                variant='outlined'
-                label='Company'
-                value={company}
-                size='small'
-                onChange={handleChange('company')}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                variant='outlined'
-                label='Email'
-                value={email}
-                size='small'
-                onChange={handleChange('email')}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                variant='outlined'
-                label='First Name'
-                value={firstName}
-                size='small'
-                onChange={handleChange('firstName')}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                variant='outlined'
-                label='Last Name'
-                value={lastName}
-                size='small'
-                onChange={handleChange('lastName')}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <TextField
-                variant='outlined'
-                label='Phone Number'
-                value={phoneNumber}
-                size='small'
-                onChange={handleChange('phoneNumber')}
-              />
-            </Grid>
-          </Grid>
-          <div>
-            <Typography variant='subtitle2' className={title}>
-              Address
-            </Typography>
-          </div>
-          <Grid container>
-            <Grid item>
-              <TextField
-                variant='outlined'
-                label='Street'
-                value={street}
-                size='small'
-                onChange={handleChange('street')}
-              />
-            </Grid>
-            <Grid item>
-              <TextField
-                variant='outlined'
-                label='City'
-                value={city}
-                size='small'
-                onChange={handleChange('city')}
-              />
-            </Grid>
-            <Grid item>
-              <TextField
-                variant='outlined'
-                label='State'
-                value={state}
-                size='small'
-                onChange={handleChange('state')}
-              />
-            </Grid>
-            <Grid item>
-              <TextField
-                variant='outlined'
-                label='Zipcode '
-                value={zip}
-                size='small'
-                onChange={handleChange('zip')}
-              />
-            </Grid>
-          </Grid>
-          <Alert />
-          <Grid container justify='center'>
-          <Button
-            variant='contained'
-            color='primary'
-            type='submit'
-            className={formButton}
-            size='large'
-            
-          >
-            Submit
-          </Button>
-          </Grid>
-        </Container>
-      </form>
-    </Paper>
-    </Container>
+    <>
+      <PageHeader
+        title='Create Customer'
+        headerIcon={<AccessibilityNewIcon />}
+      />
+      <Container>
+        <Paper className={root}>
+          <form onSubmit={(e) => onSubmit(e)}>
+            <Container className={formControl}>
+              <div className={title}>
+                <Typography variant='subtitle2'>Customer Info</Typography>
+              </div>
+              <Grid container>
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    variant='outlined'
+                    label='Company'
+                    value={company}
+                    size='small'
+                    onChange={handleChange('company')}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    variant='outlined'
+                    label='Email'
+                    value={email}
+                    size='small'
+                    onChange={handleChange('email')}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    variant='outlined'
+                    label='First Name'
+                    value={firstName}
+                    size='small'
+                    onChange={handleChange('firstName')}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    variant='outlined'
+                    label='Last Name'
+                    value={lastName}
+                    size='small'
+                    onChange={handleChange('lastName')}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <TextField
+                    variant='outlined'
+                    label='Phone Number'
+                    value={phoneNumber}
+                    size='small'
+                    onChange={handleChange('phoneNumber')}
+                    required
+                  />
+                </Grid>
+              </Grid>
+              <div>
+                <Typography variant='subtitle2' className={title}>
+                  Address
+                </Typography>
+              </div>
+              <Grid container>
+                <Grid item>
+                  <TextField
+                    variant='outlined'
+                    label='Street'
+                    value={street}
+                    size='small'
+                    onChange={handleChange('street')}
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    variant='outlined'
+                    label='City'
+                    value={city}
+                    size='small'
+                    onChange={handleChange('city')}
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    variant='outlined'
+                    label='State'
+                    value={state}
+                    size='small'
+                    onChange={handleChange('state')}
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    variant='outlined'
+                    label='Zipcode '
+                    value={zip}
+                    size='small'
+                    onChange={handleChange('zip')}
+                  />
+                </Grid>
+              </Grid>
+              <Alert />
+              <Grid container justify='center'>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  type='submit'
+                  className={formButton}
+                  size='large'
+                >
+                  Submit
+                </Button>
+              </Grid>
+            </Container>
+          </form>
+        </Paper>
+      </Container>
     </>
   );
 }

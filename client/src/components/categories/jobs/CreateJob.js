@@ -3,6 +3,9 @@ import { listAssets } from '../../../api/api-get';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import { createAsset } from '../../../api/api-post';
+import { connect } from 'react-redux';
+import { setAlert } from '../../../actions/alert';
+import Alert from '../../layout/Alert';
 
 import {
   Checkbox,
@@ -60,31 +63,34 @@ const useStyles = makeStyles({
   },
 });
 
-export default function CreateJob() {
+function CreateJob({ setAlert }) {
   const { title, root, formElement } = useStyles();
 
-  const [location, setLocation] = useState({
+  const initialLocation = {
     street: '',
     city: '',
     state: 'GA',
     zipcode: '',
     lotNumber: '',
     subdivision: '',
-  });
-  const currentYear = new Date().getFullYear();
-  const [inputFieldData, setInputFieldData] = useState({
+  };
+
+  const initialFieldData = {
     jobName: '',
     customer: '',
     notes: '',
-    status: 'Unscheduled',
-  });
-  const { jobName, customer } = inputFieldData;
+  };
 
+  const [location, setLocation] = useState(initialLocation);
+
+  const [inputFieldData, setInputFieldData] = useState(initialFieldData);
   const [jobType, setJobType] = useState('Flat');
-
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
+  const [keepUnscheduled, setKeepUnscheduled] = useState(false);
 
+  const { jobName, customer } = inputFieldData;
+  const currentYear = new Date().getFullYear();
   const { data: customers } = useGetRequest(listAssets, '/customers');
 
   useEffect(() => {
@@ -112,8 +118,8 @@ export default function CreateJob() {
           return 'Hourly';
         }
       },
-      scheduledDate: selectedDate,
-      scheduledTime: selectedTime,
+      scheduledDate: !keepUnscheduled ? selectedDate : '',
+      scheduledTime: !keepUnscheduled ? selectedTime : '',
       location: {
         street: location.street,
         city: location.city,
@@ -122,10 +128,21 @@ export default function CreateJob() {
         lotNumber: location.lotNumber,
         subdivision: location.subdivision,
       },
-      status: 'Unscheduled',
+      status: !keepUnscheduled ? 'Scheduled' : 'Unscheduled',
     };
 
-    createAsset(job, '/jobs');
+    createAsset(job, '/jobs').then((res) => {
+      if (!res.error) {
+        setLocation(initialLocation);
+        setInputFieldData(initialFieldData);
+        setJobType('Flat');
+        setSelectedDate(new Date());
+        setSelectedTime(new Date());
+        setAlert(res.message);
+      } else {
+        setAlert(res.error);
+      }
+    });
   };
 
   const handleChange = (name) => (e) => {
@@ -191,7 +208,7 @@ export default function CreateJob() {
                   <Select
                     labelId='customer-label'
                     id='customer-select'
-                    value={customer.name}
+                    value={customer}
                     onChange={handleCustomer}
                     style={{ height: '2.4rem' }}
                   >
@@ -207,35 +224,48 @@ export default function CreateJob() {
             </Grid>
           </FormControl>
           <Grid container>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <Grid item xs={4}>
-                <KeyboardDatePicker
-                  disableToolbar
-                  variant='inline'
-                  format='MM/dd/yyy'
-                  margin='normal'
-                  id='date-picker'
-                  label='Scheduled Date'
-                  value={selectedDate}
-                  onChange={setSelectedDate}
-                  KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                  }}
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <KeyboardTimePicker
-                  margin='normal'
-                  id='time-picker'
-                  label='Scheduled Time'
-                  value={selectedTime}
-                  onChange={setSelectedTime}
-                  KeyboardButtonProps={{
-                    'aria-label': 'change time',
-                  }}
-                />
-              </Grid>
-            </MuiPickersUtilsProvider>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={keepUnscheduled}
+                    onChange={(e) => setKeepUnscheduled(!keepUnscheduled)}
+                  />
+                }
+                label='Leave Unscheduled'
+              />
+            </Grid>
+            {!keepUnscheduled && (
+              <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <Grid item xs={4}>
+                  <KeyboardDatePicker
+                    disableToolbar
+                    variant='inline'
+                    format='MM/dd/yyy'
+                    margin='normal'
+                    id='date-picker'
+                    label='Scheduled Date'
+                    value={selectedDate}
+                    onChange={setSelectedDate}
+                    KeyboardButtonProps={{
+                      'aria-label': 'change date',
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <KeyboardTimePicker
+                    margin='normal'
+                    id='time-picker'
+                    label='Scheduled Time'
+                    value={selectedTime}
+                    onChange={setSelectedTime}
+                    KeyboardButtonProps={{
+                      'aria-label': 'change time',
+                    }}
+                  />
+                </Grid>
+              </MuiPickersUtilsProvider>
+            )}
           </Grid>
           <Grid container>
             <Grid item xs={12}>
@@ -272,11 +302,15 @@ export default function CreateJob() {
                   </Grid>
                 </RadioGroup>
               </FormControl>
+              <Alert />
             </Grid>
           </Grid>
+
           <FormButton text='Submit' />
         </Container>
       </form>
     </Paper>
   );
 }
+
+export default connect(null, { setAlert })(CreateJob);

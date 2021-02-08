@@ -7,11 +7,13 @@ const useGetRequest = (fetchFunction, url) => {
 
   useEffect(() => {
     const abortCont = new AbortController();
+
     fetchFunction(abortCont.signal, url).then((data) => setData(data));
     return () => {
       abortCont.abort();
     };
   }, [fetchFunction, url]);
+
   return { data };
 };
 
