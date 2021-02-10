@@ -13,7 +13,7 @@ const CompleteJob = () => {
   const { data: job } = useGetRequest(singleAsset, `/job/${jobId}`);
   const { data: employees } = useGetRequest(listAssets, '/employees');
 
-  const { employeeList, setEmployeeList } = useState();
+  const [checkedIds, setCheckedIds] = useState([]);
 
   return (
     <>
@@ -26,29 +26,25 @@ const CompleteJob = () => {
           <h3>Complete {job.jobName}</h3>
         </Grid>
         <Grid item>
-          {employeeList &&
-            employeeList.map((employee) => (
+          {employees &&
+            employees.map((employee) => (
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={state.checkedA}
-                    onChange={handleChange}
+                    checked={checkedIds.find((id) => id === employee._id)}
+                    onChange={({ target: { checked } }) =>
+                      setCheckedIds((prev) =>
+                        checked
+                          ? [...prev, employee._id]
+                          : prev.filter((id) => id !== employee._id)
+                      )
+                    }
                     name='checkedA'
                   />
                 }
                 label='Secondary'
               />
             ))}
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={state.checkedA}
-                onChange={handleChange}
-                name='checkedA'
-              />
-            }
-            label='Secondary'
-          />
         </Grid>
       </Grid>
     </>
